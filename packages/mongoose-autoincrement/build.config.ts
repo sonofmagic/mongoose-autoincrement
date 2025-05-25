@@ -21,4 +21,7 @@ export default defineBuildConfig({
   },
   // dts
   declaration: true,
+  externals: [
+    'mongoose',
+  ],
 })

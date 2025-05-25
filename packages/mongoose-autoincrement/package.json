@@ -38,5 +38,9 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix"
   },
-  "publishConfig": {}
+  "publishConfig": {},
+  "devDependencies": {
+    "defu": "^6.1.4",
+    "mongoose": "^8.15.0"
+  }
 }
