@@ -83,7 +83,7 @@ function plugin(schema: Schema, options: UserDefinedOptions) {
     if (!counter) {
     // If no counter exists then create one and save it.
       counter = new IdentityCounter({ model: settings.model, field: settings.field, count: settings.startAt - settings.incrementBy })
-      counter.save().then(() => {
+      return counter.save().then(() => {
         ready = true
       })
     }
