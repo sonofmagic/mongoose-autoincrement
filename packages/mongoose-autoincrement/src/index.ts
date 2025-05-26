@@ -24,9 +24,6 @@ function initialize(mongoose: Mongoose) {
       // Create a unique index using the "field" and "model" fields.
       counterSchema.index({ field: 1, model: 1 }, {
         unique: true,
-
-        // required: true,
-        // index: -1,
       })
 
       // Create model using new schema.
@@ -40,14 +37,14 @@ function initialize(mongoose: Mongoose) {
 
 export interface UserDefinedOptions {
   model: string
-  field: string
-  startAt: number
-  incrementBy: number
-  unique: boolean
+  field?: string
+  startAt?: number
+  incrementBy?: number
+  unique?: boolean
 }
 
 // The function to use when invoking the plugin on a custom schema.
-function plugin(schema: Schema, options?: UserDefinedOptions) {
+function plugin(schema: Schema, options: UserDefinedOptions) {
   // If we don't have reference to the counterSchema or the IdentityCounter model then the plugin was most likely not
   // initialized properly so throw an error.
   if (!counterSchema || !IdentityCounter) {
@@ -55,8 +52,8 @@ function plugin(schema: Schema, options?: UserDefinedOptions) {
   }
 
   // Default settings and plugin scope variables.
-  const settings = defu<UserDefinedOptions, UserDefinedOptions[]>(options, {
-    model: DEFAULT_MODEL_NAME, // The model to configure the plugin for.
+  const settings = defu<Required<UserDefinedOptions>, Partial<UserDefinedOptions>[]>(options, {
+    // model: null, // The model to configure the plugin for.
     field: '_id', // The field the plugin should track.
     startAt: 0, // The number the count should start at.
     incrementBy: 1, // The number by which to increment the count each time.
@@ -65,7 +62,7 @@ function plugin(schema: Schema, options?: UserDefinedOptions) {
   const fields: Record<string, any> = {} // A hash of fields to add properties to in Mongoose.
   let ready = false // True if the counter collection has been updated and the document is ready to be saved.
 
-  if (settings.model == null) {
+  if (settings.model === undefined) {
     throw new Error('model must be set')
   }
 
@@ -80,11 +77,11 @@ function plugin(schema: Schema, options?: UserDefinedOptions) {
   schema.add(fields)
 
   // Find the counter for this model and the relevant field.
-  IdentityCounter.findOne(
+  const initPromise = IdentityCounter.findOne(
     { model: settings.model, field: settings.field },
   ).then((counter) => {
     if (!counter) {
-      // If no counter exists then create one and save it.
+    // If no counter exists then create one and save it.
       counter = new IdentityCounter({ model: settings.model, field: settings.field, count: settings.startAt - settings.incrementBy })
       counter.save().then(() => {
         ready = true
@@ -127,7 +124,7 @@ function plugin(schema: Schema, options?: UserDefinedOptions) {
   // Every time documents in this schema are saved, run this logic.
   schema.pre('save', async function (next, _opts) {
     // Get reference to the document being saved.
-
+    await initPromise
     // Only do this if it is a new document (see http://mongoosejs.com/docs/api.html#document_Document-isNew)
     if (this.isNew) {
       const save = async () => {
