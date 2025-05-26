@@ -1,6 +1,6 @@
-# mongoose-autoincrement
+# mongoose-incremental
 
-`mongoose-autoincrement` is a Mongoose plugin that enables auto-incrementing numeric fields in your MongoDB documents. It’s particularly useful for custom ID generation or maintaining ordered values.
+`mongoose-incremental` is a Mongoose plugin that enables auto-incrementing numeric fields in your MongoDB documents. It’s particularly useful for custom ID generation or maintaining ordered values.
 
 ## Features
 
@@ -12,7 +12,7 @@
 ## Installation
 
 ```bash
-npm install mongoose-autoincrement
+npm install mongoose-incremental
 ```
 
 ## Initialization
@@ -21,7 +21,7 @@ Before using the plugin, you **must initialize** it with your Mongoose instance:
 
 ```ts
 import mongoose from 'mongoose'
-import { initialize } from 'mongoose-autoincrement'
+import { initialize } from 'mongoose-incremental'
 
 initialize(mongoose)
 ```
@@ -34,7 +34,7 @@ To apply the plugin to a Mongoose schema:
 
 ```ts
 import { model, Schema } from 'mongoose'
-import { plugin } from 'mongoose-autoincrement'
+import { plugin } from 'mongoose-incremental'
 
 const bookSchema = new Schema({
   title: String,

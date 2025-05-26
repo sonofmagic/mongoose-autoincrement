@@ -48,7 +48,7 @@ function plugin(schema: Schema, options: UserDefinedOptions) {
   // If we don't have reference to the counterSchema or the IdentityCounter model then the plugin was most likely not
   // initialized properly so throw an error.
   if (!counterSchema || !IdentityCounter) {
-    throw new Error('mongoose-autoincrement has not been initialized')
+    throw new Error('mongoose-incremental has not been initialized')
   }
 
   // Default settings and plugin scope variables.

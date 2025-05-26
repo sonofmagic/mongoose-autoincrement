@@ -108,7 +108,7 @@ importers:
         specifier: ^2.8.0
         version: 2.8.0
 
-  packages/mongoose-autoincrement:
+  packages/mongoose-incremental:
     devDependencies:
       defu:
         specifier: ^6.1.4

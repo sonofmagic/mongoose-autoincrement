@@ -1,19 +1,28 @@
 {
-  "name": "mongoose-autoincrement",
+  "name": "mongoose-incremental",
   "type": "module",
   "version": "0.0.0",
-  "description": "esbuild build package template",
+  "description": "`mongoose-incremental` is a Mongoose plugin that enables auto-incrementing numeric fields in your MongoDB documents. It’s particularly useful for custom ID generation or maintaining ordered values",
   "author": "ice breaker <1324318532@qq.com>",
   "license": "ISC",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/sonofmagic/mongoose-autoincrement.git",
-    "directory": "packages/mongoose-autoincrement"
+    "url": "git+https://github.com/sonofmagic/mongoose-incremental.git",
+    "directory": "packages/mongoose-incremental"
   },
   "bugs": {
-    "url": "https://github.com/sonofmagic/mongoose-autoincrement/issues"
+    "url": "https://github.com/sonofmagic/mongoose-incremental/issues"
   },
-  "keywords": [],
+  "keywords": [
+    "mongoose",
+    "mongodb",
+    "plugin",
+    "incremental",
+    "auto-increment",
+    "id-generator",
+    "mongoose-plugin",
+    "mongoose-plugin-incremental"
+  ],
   "sideEffects": false,
   "exports": {
     ".": {

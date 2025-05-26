@@ -2,7 +2,7 @@
 
 ## Projects
 
-- [mongoose-autoincrement](packages/mongoose-autoincrement) - esbuild build package template
+- [mongoose-incremental](packages/mongoose-incremental) - `mongoose-incremental` is a Mongoose plugin that enables auto-incrementing numeric fields in your MongoDB documents. It’s particularly useful for custom ID generation or maintaining ordered values
 
 ## Contributing
 
