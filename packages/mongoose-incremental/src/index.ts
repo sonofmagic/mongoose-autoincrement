@@ -3,7 +3,15 @@ import { defu } from 'defu'
 
 let counterSchema: Schema
 
-let IdentityCounter: Model<any, unknown, unknown, unknown, any, any>
+export interface RawDocType {
+  model: string
+  field: string
+  count?: number
+}
+
+type IdentityCounterModel = Model<RawDocType, unknown, unknown, unknown, any, any>
+
+let IdentityCounter: IdentityCounterModel
 
 const DEFAULT_MODEL_NAME = 'IdentityCounter'
 
@@ -15,7 +23,7 @@ function initialize(mongoose: Mongoose) {
   catch (ex) {
     if ((ex as MongooseError).name === 'MissingSchemaError') {
       // Create new counter schema.
-      counterSchema = new mongoose.Schema({
+      counterSchema = new mongoose.Schema<RawDocType>({
         model: { type: String, require: true },
         field: { type: String, require: true },
         count: { type: Number, default: 0 },
@@ -27,7 +35,7 @@ function initialize(mongoose: Mongoose) {
       })
 
       // Create model using new schema.
-      IdentityCounter = mongoose.model(DEFAULT_MODEL_NAME, counterSchema)
+      IdentityCounter = mongoose.model<RawDocType>(DEFAULT_MODEL_NAME, counterSchema)
     }
     else {
       throw ex
@@ -41,6 +49,7 @@ export interface UserDefinedOptions {
   startAt?: number
   incrementBy?: number
   unique?: boolean
+  forceSync?: boolean
 }
 
 // The function to use when invoking the plugin on a custom schema.
@@ -58,6 +67,7 @@ function plugin(schema: Schema, options: UserDefinedOptions) {
     startAt: 0, // The number the count should start at.
     incrementBy: 1, // The number by which to increment the count each time.
     unique: true, // Should we create a unique index for the field
+    forceSync: false, // Should we force sync the counter collection with the documents in the database.
   })
   const fields: Record<string, any> = {} // A hash of fields to add properties to in Mongoose.
   let ready = false // True if the counter collection has been updated and the document is ready to be saved.
@@ -77,17 +87,28 @@ function plugin(schema: Schema, options: UserDefinedOptions) {
   schema.add(fields)
 
   // Find the counter for this model and the relevant field.
-  const initPromise = IdentityCounter.findOne(
+  const initPromise = IdentityCounter.find(
     { model: settings.model, field: settings.field },
-  ).then((counter) => {
-    if (!counter) {
+  ).then((counters) => {
+    if (counters.length === 0) {
     // If no counter exists then create one and save it.
-      counter = new IdentityCounter({ model: settings.model, field: settings.field, count: settings.startAt - settings.incrementBy })
+      const counter = new IdentityCounter({ model: settings.model, field: settings.field, count: settings.startAt - settings.incrementBy })
       return counter.save().then(() => {
         ready = true
       })
     }
     else {
+      // if (counters.length === 1) {
+      //   const hit: IdentityCounterModel = counters[0]
+      //   if (settings.forceSync) {
+
+      //   }
+      // }
+      // else if (counters.length > 1) {
+      //   if (settings.forceSync) {
+
+      //   }
+      // }
       ready = true
     }
   })
