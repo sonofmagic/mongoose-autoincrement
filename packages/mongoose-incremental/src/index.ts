@@ -1,7 +1,7 @@
 import type { Model, Mongoose, MongooseError, Schema } from 'mongoose'
 import { defu } from 'defu'
 
-let counterSchema: Schema
+let counterSchema: Schema<RawDocType>
 
 export interface RawDocType {
   model: string
@@ -9,14 +9,17 @@ export interface RawDocType {
   count?: number
 }
 
-type IdentityCounterModel = Model<RawDocType, unknown, unknown, unknown, any, any>
+export type IdentityCounterModel = Model<RawDocType, unknown, unknown, unknown, any, any>
 
 let IdentityCounter: IdentityCounterModel
 
-const DEFAULT_MODEL_NAME = 'IdentityCounter'
+let mongoose: Mongoose
+
+export const DEFAULT_MODEL_NAME = 'IdentityCounter'
 
 // Initialize plugin by creating counter collection in database.
-function initialize(mongoose: Mongoose) {
+function initialize(mongooseRef: Mongoose) {
+  mongoose = mongooseRef
   try {
     IdentityCounter = mongoose.model(DEFAULT_MODEL_NAME)
   }
@@ -92,7 +95,8 @@ function plugin(schema: Schema, options: UserDefinedOptions) {
   ).then((counters) => {
     if (counters.length === 0) {
     // If no counter exists then create one and save it.
-      const counter = new IdentityCounter({ model: settings.model, field: settings.field, count: settings.startAt - settings.incrementBy })
+      const count = settings.startAt - settings.incrementBy
+      const counter = new IdentityCounter({ model: settings.model, field: settings.field, count })
       return counter.save().then(() => {
         ready = true
       })
@@ -207,7 +211,16 @@ function plugin(schema: Schema, options: UserDefinedOptions) {
   })
 }
 
+function getState() {
+  return {
+    mongoose,
+    IdentityCounter,
+    counterSchema,
+  }
+}
+
 export {
+  getState,
   initialize,
   plugin,
 }

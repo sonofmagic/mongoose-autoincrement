@@ -1,8 +1,8 @@
 import CI from 'ci-info'
 import mongoose from 'mongoose'
-import { initialize, plugin } from '@/index'
+import { getState, initialize, plugin } from '@/index'
 
-describe.skipIf(CI.isCI)('index', () => {
+describe.skipIf(CI.isCI).sequential('index', () => {
   beforeAll(async () => {
     await mongoose.connect('mongodb://127.0.0.1:27018/test')
     await initialize(mongoose)
@@ -26,9 +26,24 @@ describe.skipIf(CI.isCI)('index', () => {
 
     const Kitten = mongoose.model('Kitten', kittySchema)
     const silence = new Kitten({ name: 'Silence' })
-    console.log(silence.name) // 'Silence'
+    await silence.save()
     const fluffy = new Kitten({ name: 'fluffy' })
     await fluffy.save()
     fluffy.speak() // "Meow name is fluffy"
+    expect(silence._id).toBe(0)
+    expect(fluffy._id).toBe(1)
+    const counts = await Kitten.countDocuments()
+    expect(counts).toBe(2)
+    const { IdentityCounter } = getState()
+    const identityCounts = await IdentityCounter.countDocuments()
+    expect(identityCounts).toBe(1)
+    const identityCounter = await IdentityCounter.findOne({ model: 'Kitten', field: '_id' })
+    expect(identityCounter).toBeDefined()
+    expect(identityCounter.count).toBe(1)
+  })
+
+  afterEach(() => {
+    mongoose.connection.db?.dropCollection('identitycounters')
+    mongoose.connection.db?.dropCollection('kittens')
   })
 })
