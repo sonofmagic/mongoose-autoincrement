@@ -31,7 +31,7 @@ importers:
         version: 1.1.5(@vue/compiler-sfc@3.5.13)(eslint@9.27.0(jiti@2.4.2))(tailwindcss@3.4.14)(ts-api-utils@2.1.0(typescript@5.8.3))(typescript@5.8.3)(vitest@3.1.4(@types/debug@4.1.12)(@types/node@22.15.21)(jiti@2.4.2)(tsx@4.19.4)(yaml@2.8.0))
       '@icebreakers/monorepo':
         specifier: latest
-        version: 0.7.11(@types/node@22.15.21)(typanion@3.14.0)
+        version: 1.0.0(@types/node@22.15.21)(typanion@3.14.0)
       '@icebreakers/stylelint-config':
         specifier: ^1.0.1
         version: 1.0.1(postcss@8.5.3)(stylelint@16.10.0(typescript@5.8.3))
@@ -71,6 +71,9 @@ importers:
       lint-staged:
         specifier: ^16.0.0
         version: 16.0.0
+      mongodb:
+        specifier: ^6.16.0
+        version: 6.16.0(socks@2.8.4)
       only-allow:
         specifier: ^1.2.1
         version: 1.2.1
@@ -1139,16 +1142,16 @@ packages:
   '@icebreakers/eslint-config@1.1.5':
     resolution: {integrity: sha512-RG6hoAS2UMRTkPLd10QvoC8z/LBdcA90euqWwrM9SIXxkKqDrj9fMp5vZ7Qbn39D37tZRaI6E2WvnHxf3fAYUQ==}
 
-  '@icebreakers/monorepo@0.7.11':
-    resolution: {integrity: sha512-j4e1a4fJIctu3eVlRTDrHosN6uBLNgbDkPmHLz1XKGgjURAj25YNfZyse024zd+GK/mbt7IQ8FKVcRsYtC5ZrQ==}
+  '@icebreakers/monorepo@1.0.0':
+    resolution: {integrity: sha512-ReKjO6Vq3jnP1xnI/Eo91IxcZYVKrd3p5wxA6Vzh2yn/4uwSGXGo+hAZ3UWhseY1H3DX+eqcx2bxfYKKwgwWew==}
     hasBin: true
 
   '@icebreakers/stylelint-config@1.0.1':
     resolution: {integrity: sha512-zd/yQ01wj8xyZs8BM4VKvfvtbR+VxUo/dy2wGeCNrHVJ7tcbSHGKT4CEayK2R3phKz5q73rXtS0/K9ciKDFLsA==}
     hasBin: true
 
-  '@inquirer/checkbox@4.1.7':
-    resolution: {integrity: sha512-VEr2vnI4TSM2Q50fAck98mzWJGAoxbF0rb48tcSEjkJ2kn3mM6c/YsJwnyu45PlXd6aNWObMGWmQVleL2BJy6w==}
+  '@inquirer/checkbox@4.1.8':
+    resolution: {integrity: sha512-d/QAsnwuHX2OPolxvYcgSj7A9DO9H6gVOy2DvBTx+P2LH2iRTo/RSGV3iwCzW024nP9hw98KIuDmdyhZQj1UQg==}
     engines: {node: '>=18'}
     peerDependencies:
       '@types/node': '>=18'
@@ -1156,8 +1159,8 @@ packages:
       '@types/node':
         optional: true
 
-  '@inquirer/confirm@5.1.11':
-    resolution: {integrity: sha512-HgVha2B1lurfZ8u7cBWmu60HpkpnnIT/1IrreBx5g2oxQOVYU15WQDl6oZqjuXVbzteFKSpmMkLTMf2OmbUjaw==}
+  '@inquirer/confirm@5.1.12':
+    resolution: {integrity: sha512-dpq+ielV9/bqgXRUbNH//KsY6WEw9DrGPmipkpmgC1Y46cwuBTNx7PXFWTjc3MQ+urcc0QxoVHcMI0FW4Ok0hg==}
     engines: {node: '>=18'}
     peerDependencies:
       '@types/node': '>=18'
@@ -1165,8 +1168,8 @@ packages:
       '@types/node':
         optional: true
 
-  '@inquirer/core@10.1.12':
-    resolution: {integrity: sha512-uoaDadeJCYSVKYCMPwJi3AjCF9w+l9aWbHYA4iskKX84cVW/A2M6bJlWBoy3k81GpFp6EX3IElV1Z5xKw0g1QQ==}
+  '@inquirer/core@10.1.13':
+    resolution: {integrity: sha512-1viSxebkYN2nJULlzCxES6G9/stgHSepZ9LqqfdIGPHj5OHhiBUXVS0a6R0bEC2A+VL4D9w6QB66ebCr6HGllA==}
     engines: {node: '>=18'}
     peerDependencies:
       '@types/node': '>=18'
@@ -2892,6 +2895,10 @@ packages:
   commander@13.1.0:
     resolution: {integrity: sha512-/rFeCpNJQbhSZjGVwO9RFV3xPqbnERS8MmIQzCtD/zl6gpJuV/bMLuN92oG3F7d8oDEHHRrujSXNUr8fpjntKw==}
     engines: {node: '>=18'}
+
+  commander@14.0.0:
+    resolution: {integrity: sha512-2uM9rYjPvyq39NwLRqaiLtWHyDC1FvryJDa2ATTVims5YAS4PupsEQsDvP14FqhFr0P49CYDugi59xaxJlTXRA==}
+    engines: {node: '>=20'}
 
   commander@4.1.1:
     resolution: {integrity: sha512-NOKm8xhkzAjzFx8B2v5OAHT+u5pRQc2UCa2Vq9jYL/31o2wi9mxBA7LIFs3sV5VSC49z6pEhfbMULvShKj26WA==}
@@ -7976,15 +7983,15 @@ snapshots:
       - typescript
       - vitest
 
-  '@icebreakers/monorepo@0.7.11(@types/node@22.15.21)(typanion@3.14.0)':
+  '@icebreakers/monorepo@1.0.0(@types/node@22.15.21)(typanion@3.14.0)':
     dependencies:
-      '@inquirer/checkbox': 4.1.7(@types/node@22.15.21)
-      '@inquirer/confirm': 5.1.11(@types/node@22.15.21)
+      '@inquirer/checkbox': 4.1.8(@types/node@22.15.21)
+      '@inquirer/confirm': 5.1.12(@types/node@22.15.21)
       '@pnpm/logger': 1001.0.0
       '@pnpm/types': 1000.6.0
       '@pnpm/worker': 1000.1.6(@pnpm/logger@1001.0.0)(@types/node@22.15.21)
       '@pnpm/workspace.find-packages': 1000.0.24(@pnpm/logger@1001.0.0)(@pnpm/worker@1000.1.6(@pnpm/logger@1001.0.0)(@types/node@22.15.21))(typanion@3.14.0)
-      commander: 13.1.0
+      commander: 14.0.0
       comment-json: 4.2.5
       consola: 3.4.2
       execa: 9.5.3
@@ -8013,9 +8020,9 @@ snapshots:
       - postcss
       - stylelint
 
-  '@inquirer/checkbox@4.1.7(@types/node@22.15.21)':
+  '@inquirer/checkbox@4.1.8(@types/node@22.15.21)':
     dependencies:
-      '@inquirer/core': 10.1.12(@types/node@22.15.21)
+      '@inquirer/core': 10.1.13(@types/node@22.15.21)
       '@inquirer/figures': 1.0.12
       '@inquirer/type': 3.0.7(@types/node@22.15.21)
       ansi-escapes: 4.3.2
@@ -8023,14 +8030,14 @@ snapshots:
     optionalDependencies:
       '@types/node': 22.15.21
 
-  '@inquirer/confirm@5.1.11(@types/node@22.15.21)':
+  '@inquirer/confirm@5.1.12(@types/node@22.15.21)':
     dependencies:
-      '@inquirer/core': 10.1.12(@types/node@22.15.21)
+      '@inquirer/core': 10.1.13(@types/node@22.15.21)
       '@inquirer/type': 3.0.7(@types/node@22.15.21)
     optionalDependencies:
       '@types/node': 22.15.21
 
-  '@inquirer/core@10.1.12(@types/node@22.15.21)':
+  '@inquirer/core@10.1.13(@types/node@22.15.21)':
     dependencies:
       '@inquirer/figures': 1.0.12
       '@inquirer/type': 3.0.7(@types/node@22.15.21)
@@ -10122,6 +10129,8 @@ snapshots:
   colorette@2.0.20: {}
 
   commander@13.1.0: {}
+
+  commander@14.0.0: {}
 
   commander@4.1.1: {}
 

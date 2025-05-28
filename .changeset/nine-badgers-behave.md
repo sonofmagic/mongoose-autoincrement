@@ -1,0 +1,5 @@
+---
+"mongoose-incremental": major
+---
+
+chore
