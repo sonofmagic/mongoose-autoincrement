@@ -1,4 +1,13 @@
-import type { CallbackWithoutResultAndOptionalError, Document, FlatRecord, Model, Mongoose, MongooseError, Schema } from 'mongoose'
+import type {
+  CallbackWithoutResultAndOptionalError,
+  Connection,
+  Document,
+  FlatRecord,
+  Model,
+  Mongoose,
+  MongooseError,
+  Schema,
+} from 'mongoose'
 import { defu } from 'defu'
 
 let counterSchema: Schema<IIdentityCounter>
@@ -13,15 +22,24 @@ export type IdentityCounterModel = Model<IIdentityCounter>
 
 let IdentityCounter: IdentityCounterModel
 
-let mongoose: Mongoose
-
+let mongooseRef: Mongoose
+let connectionRef: Connection | undefined
 export const DEFAULT_MODEL_NAME = 'IdentityCounter'
 
 // Initialize plugin by creating counter collection in database.
-function initialize(mongooseRef: Mongoose) {
-  mongoose = mongooseRef
+function initialize(
+  mongoose: Mongoose,
+  connection?: Connection,
+) {
+  mongooseRef = mongoose
+  connectionRef = connection
+
+  function getModel(schema?: Schema): IdentityCounterModel {
+    return connection ? connection.model<IIdentityCounter>(DEFAULT_MODEL_NAME, schema) : mongoose.model<IIdentityCounter>(DEFAULT_MODEL_NAME, schema)
+  }
+
   try {
-    IdentityCounter = mongoose.model<IIdentityCounter>(DEFAULT_MODEL_NAME)
+    IdentityCounter = getModel()
   }
   catch (ex) {
     if ((ex as MongooseError).name === 'MissingSchemaError') {
@@ -42,7 +60,7 @@ function initialize(mongooseRef: Mongoose) {
       })
 
       // Create model using new schema.
-      IdentityCounter = mongoose.model<IIdentityCounter>(DEFAULT_MODEL_NAME, counterSchema)
+      IdentityCounter = getModel(counterSchema)
     }
     else {
       throw ex
@@ -56,7 +74,6 @@ export interface UserDefinedOptions {
   startAt?: number
   incrementBy?: number
   unique?: boolean
-  forceSync?: boolean
 }
 // https://github.com/ramiel/mongoose-sequence/blob/master/lib/sequence.js
 // https://github.com/Automattic/mongoose/blob/0c5f56f8bacc409e7b73f756196f34a307364647/lib/schema.js
@@ -75,7 +92,6 @@ async function createPlugin(options: UserDefinedOptions) {
     startAt: 0, // The number the count should start at.
     incrementBy: 1, // The number by which to increment the count each time.
     unique: true, // Should we create a unique index for the field
-    forceSync: false, // Should we force sync the counter collection with the documents in the database.
   })
   const fields: Record<string, any> = {} // A hash of fields to add properties to in Mongoose.
 
@@ -93,7 +109,7 @@ async function createPlugin(options: UserDefinedOptions) {
   }
 
   // Find the counter for this model and the relevant field.
-  await IdentityCounter.find(
+  const counter = await IdentityCounter.findOne(
     { model: settings.model, field: settings.field },
     undefined,
     {
@@ -101,23 +117,16 @@ async function createPlugin(options: UserDefinedOptions) {
         count: -1,
       },
     },
-  ).then((counters) => {
-    if (counters.length === 0) {
-      // If no counter exists then create one and save it.
-      const count = settings.startAt - settings.incrementBy
-      const counter = new IdentityCounter({ model: settings.model, field: settings.field, count })
-      return counter.save()
-    }
-  })
+  )
+  if (!counter) {
+    // If no counter exists then create one and save it.
+    const count = settings.startAt - settings.incrementBy
+    const counter = new IdentityCounter({ model: settings.model, field: settings.field, count })
+    await counter.save()
+  }
   // The function to use when invoking the plugin on a custom schema.
   return function plugin(schema: Schema, _options?: { deduplicate?: boolean }) {
     schema.add(fields)
-    // schema.pre('init', () => {
-    //   console.log('init')
-    // })
-    // schema.post('init', () => {
-    //   console.log('init')
-    // })
     // Declare a function to get the next counter for the model/schema.
     async function nextCount() {
       const counter = await IdentityCounter.findOne({
@@ -216,9 +225,10 @@ async function createPlugin(options: UserDefinedOptions) {
 
 function getState() {
   return {
-    mongoose,
+    mongoose: mongooseRef,
     IdentityCounter,
     counterSchema,
+    connection: connectionRef,
   }
 }
 

@@ -2,4 +2,4 @@
 "mongoose-incremental": major
 ---
 
-chore
+feat!: release 1.0.0

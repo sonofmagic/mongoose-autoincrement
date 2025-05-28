@@ -1,13 +1,14 @@
 # mongoose-incremental
 
-`mongoose-incremental` is a Mongoose plugin that enables auto-incrementing numeric fields in your MongoDB documents. It’s particularly useful for custom ID generation or maintaining ordered values.
+A lightweight and flexible Mongoose plugin to auto-increment numeric fields in your MongoDB models. Useful for sequential IDs or counters with custom settings.
 
 ## Features
 
-- Auto-increments a numeric field on document creation
+- Auto-increment fields (including `_id` or any custom field)
+- Supports multiple models and fields
 - Customizable starting value and increment step
-- Supports counter reset
-- Enforces uniqueness via indexes
+- Optional uniqueness enforcement on fields
+- Utility methods: `nextCount`, `resetCount`
 
 ## Installation
 
@@ -15,9 +16,17 @@
 npm install mongoose-incremental
 ```
 
-## Initialization
+or
 
-Before using the plugin, you **must initialize** it with your Mongoose instance:
+```bash
+yarn add mongoose-incremental
+```
+
+## Usage
+
+### 1. Initialize Plugin
+
+Before applying the plugin, you must initialize it with a Mongoose instance.
 
 ```ts
 import mongoose from 'mongoose'
@@ -26,74 +35,135 @@ import { initialize } from 'mongoose-incremental'
 initialize(mongoose)
 ```
 
-This creates or accesses the internal `IdentityCounter` collection used for tracking counters.
-
-## Usage
-
-To apply the plugin to a Mongoose schema:
+If you're using a custom connection:
 
 ```ts
-import { model, Schema } from 'mongoose'
-import { plugin } from 'mongoose-incremental'
-
-const bookSchema = new Schema({
-  title: String,
-  author: String,
-})
-
-// Apply the plugin
-plugin(bookSchema, {
-  model: 'Book', // Required: The target model name
-  field: 'bookId', // Optional: Auto-incremented field (default: "_id")
-  startAt: 100, // Optional: Start value (default: 0)
-  incrementBy: 1, // Optional: Step value (default: 1)
-  unique: true, // Optional: Unique index enforcement (default: true)
-})
-
-const Book = model('Book', bookSchema)
+initialize(mongoose, customConnection)
 ```
 
-## Plugin Options
+---
 
-| Option        | Type      | Default | Description                                |
-| ------------- | --------- | ------- | ------------------------------------------ |
-| `model`       | `string`  | —       | Target model name (required)               |
-| `field`       | `string`  | `_id`   | The field to auto-increment                |
-| `startAt`     | `number`  | `0`     | Starting number                            |
-| `incrementBy` | `number`  | `1`     | Increment step                             |
-| `unique`      | `boolean` | `true`  | Whether to create a unique index for field |
+### 2. Configure Plugin
+
+Use `createPlugin()` to configure and generate a plugin for your specific model and field.
+
+```ts
+import { createPlugin } from 'mongoose-incremental'
+
+const plugin = await createPlugin({
+  model: 'User', // Required: Name of the model
+  field: 'userId', // Optional: Field to auto-increment (default: _id)
+  startAt: 1000, // Optional: Starting value (default: 0)
+  incrementBy: 10, // Optional: Increment step (default: 1)
+  unique: true // Optional: Enforce unique index (default: true)
+})
+```
+
+---
+
+### 3. Apply Plugin to Schema
+
+Apply the plugin to your schema:
+
+```ts
+import mongoose from 'mongoose'
+
+const userSchema = new mongoose.Schema({
+  name: String,
+})
+
+userSchema.plugin(plugin)
+
+const User = mongoose.model('User', userSchema)
+```
+
+---
+
+## Example
+
+```ts
+import mongoose from 'mongoose'
+import { createPlugin, initialize } from 'mongoose-incremental'
+
+await mongoose.connect('mongodb://localhost/test')
+
+initialize(mongoose)
+
+const plugin = await createPlugin({
+  model: 'Customer',
+  field: 'customerNumber',
+  startAt: 1000,
+})
+
+const customerSchema = new mongoose.Schema({
+  name: String,
+})
+
+customerSchema.plugin(plugin)
+
+const Customer = mongoose.model('Customer', customerSchema)
+
+const customer = await Customer.create({ name: 'John Doe' })
+console.log(customer.customerNumber) // 1000
+```
+
+---
+
+## API
+
+### `initialize(mongoose: Mongoose, connection?: Connection)`
+
+Initializes the plugin with a mongoose instance. Must be called before `createPlugin`.
+
+### `createPlugin(options: UserDefinedOptions) => Promise<PluginFunction>`
+
+Creates a plugin with your configuration.
+
+#### `UserDefinedOptions`:
+
+| Option        | Type    | Default | Description                   |
+| ------------- | ------- | ------- | ----------------------------- |
+| `model`       | string  | —       | Model name to track           |
+| `field`       | string  | `_id`   | Field to auto-increment       |
+| `startAt`     | number  | `0`     | Starting number               |
+| `incrementBy` | number  | `1`     | Step increment                |
+| `unique`      | boolean | `true`  | Add unique index on the field |
+
+---
 
 ## Schema Methods
 
-The plugin adds the following methods to your schema:
+- `doc.nextCount(): Promise<number>`
+  Returns the next counter value (does not increment).
 
-### `nextCount()`
+- `doc.resetCount(): Promise<number>`
+  Resets the counter to `startAt - incrementBy`.
 
-Returns the next value of the counter.
+## Static Methods
+
+- `Model.nextCount(): Promise<number>`
+  Same as above, on model.
+
+- `Model.resetCount(): Promise<number>`
+  Same as above, on model.
+
+---
+
+## Internal State (Debugging)
+
+You can access internal plugin state via:
 
 ```ts
-const next = await Book.nextCount()
-console.log(next) // e.g., 101
+import { getState } from 'mongoose-incremental'
+
+const state = getState()
+console.log(state.mongoose)
+console.log(state.IdentityCounter)
+console.log(state.counterSchema)
+console.log(state.connection)
 ```
 
-### `resetCount()`
-
-Resets the counter back to `startAt - incrementBy`.
-
-```ts
-await Book.resetCount()
-```
-
-## Behavior
-
-- The counter is only incremented on new document creation.
-- If a value is manually assigned and is higher than the current count, the counter is updated to that value.
-- The counter data is stored in a collection called `IdentityCounter`.
-
-## Notes
-
-- Always call `initialize(mongoose)` **before** applying the plugin.
-- If you skip initialization, the plugin will throw an error.
+---
 
 ## License
 
