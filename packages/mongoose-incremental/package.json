@@ -1,7 +1,7 @@
 {
   "name": "mongoose-incremental",
   "type": "module",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "`mongoose-incremental` is a Mongoose plugin that enables auto-incrementing numeric fields in your MongoDB documents. It’s particularly useful for custom ID generation or maintaining ordered values",
   "author": "ice breaker <1324318532@qq.com>",
   "license": "ISC",
